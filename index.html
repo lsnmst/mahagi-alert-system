@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="fr" translate="no">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Système d'alerte de déforestation de l'île d'Idjwii</title>
+    <meta property="og:description"
+        content="L'île d'Idjwi est considérée comme l'île de la paix entre les lignes ennemies. Suite aux premières inquiétudes exprimées par les communautés vivant sur l'île concernant une récente exploitation déséquilibrée des ressources naturelles et forestières, nous avons mis en place ce système d'alerte destiné aux habitants, afin qu'ils puissent surveiller l'île et veiller à ce qu'elle reste le site naturel sacré et sécurisé qui a fait sa renommée" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta property="og:image" content="assets/deforestation.jpg">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="icon" type="image/svg+xml" href="vite.svg">
+
+    <style>
+        @font-face {
+            font-family: 'Karla-Cedille';
+            src: url('assets/fonts/Cedille.woff2') format('woff2');
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        input,
+        textarea,
+        select {
+            font-family: 'Karla-Cedille', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Karla-Cedille', sans-serif;
+            color: #213547;
+            width: 100%;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100vh;
+            background: #fff;
+            font-optical-sizing: auto;
+            line-height: 1.2;
+            font-size: 1rem;
+            font-weight: 400;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* MAP */
+        #map {
+            flex: 1 1 auto;
+            width: 100%;
+            min-height: 0;
+            height: 100%;
+        }
+
+        .leaflet-container {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* FOOTER */
+        #footer {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: #fff;
+            color: #213547;
+            border-top: 1px solid #21354720;
+            background-image: url('assets/orchard-_ppFX2in.svg');
+            background-size: 100px 100px;
+            box-sizing: border-box;
+        }
+
+        #footer h1 {
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        #info-btn {
+            background: none;
+            border: #213547 1px solid;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            color: #213547;
+            font-family: 'Karla-Cedille';
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        #info-btn:hover {
+            background: red;
+            color: #fff;
+            border: none;
+        }
+
+        .leaflet-control-timebar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            font-family: 'Karla-Cedille';
+            font-size: 1.1rem;
+            color: #213547;
+            width: 240px;
+        }
+
+        .timebar-bar,
+        #footer {
+            flex-shrink: 0;
+        }
+
+        .timebar-bar {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            box-sizing: border-box;
+            background: #fff;
+            border-top: 1px solid #21354720;
+            border-bottom: 1px solid #21354720;
+        }
+
+        .timebar-label {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 1.2rem;
+        }
+
+        .timebar-slider {
+            width: 100%;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            align-items: center;
+            justify-content: center;
+            outline: 1px solid #213547 !important;
+            outline-offset: 5px;
+        }
+
+        .modal-content {
+            background: #fff;
+            color: #213547;
+            background-image: url('assets/orchard-_ppFX2in.svg');
+            background-size: 100px 100px;
+            padding: 30px;
+            border-radius: 5px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            font-family: 'Karla-Cedille';
+            max-height: 80%;
+            overflow: auto;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #213547;
+        }
+
+        .modal-content p {
+            line-height: 1.3;
+            font-size: 1.1rem;
+        }
+
+        .descr p {
+            font-size: 1rem !important;
+        }
+
+        .close-btn {
+            margin-top: 20px;
+            background: #202020;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Karla-Cedille';
+        }
+
+        .close-btn:hover {
+            background: #444;
+        }
+
+        .copy-btn {
+            font-family: 'Karla-Cedille', sans-serif;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-left: 4px;
+            color: #213547;
+        }
+
+        #copy-message {
+            font-family: 'Karla-Cedille', sans-serif;
+            font-size: 1.1rem;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .leaflet-container {
+            background: #ffffff !important;
+        }
+
+        .leaflet-control-attribution,
+        .leaflet-popup-tip {
+            display: none;
+        }
+
+        .leaflet-popup {
+            font-family: 'Karla-Cedille', sans-serif;
+        }
+
+        .copied-popup .leaflet-popup-content-wrapper {
+            background: #333;
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        #timebar {
+            margin-bottom: 10px !important;
+            background-image: url('assets/orchard-_ppFX2in.svg');
+            background-size: 100px 100px;
+            background-color: #fff;
+
+        }
+
+        .timebar-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            font-family: 'Karla-Cedille';
+            font-size: 1.1rem;
+            color: #213547;
+        }
+
+        .timebar-bar input[type="date"] {
+            padding: 3px 6px;
+            border: 1px solid #213547;
+            border-radius: 4px;
+            font-family: 'Karla-Cedille';
+        }
+
+        .timebar-bar button {
+            padding: 5px 10px;
+            font-family: 'Karla-Cedille';
+            border: 1px solid #213547;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .timebar-bar button:hover {
+            background: red;
+            color: #fff;
+        }
+
+        .timebar-slider {
+            font-family: 'Karla-Cedille' !important;
+        }
+
+        .flatpickr-calendar {
+            font-family: 'Karla-Cedille' !important;
+            border-radius: 8px !important;
+            border: 1px solid #21354740 !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0) !important;
+        }
+
+        .flatpickr-month {
+            background-image: url('assets/orchard-_ppFX2in.svg') !important;
+            background-size: 100px 100px !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: red !important;
+            color: red !important;
+        }
+
+        .flatpickr-day.selected {
+            background: red !important;
+            border-color: red !important;
+            color: #fff !important;
+        }
+
+        .flatpickr-months,
+        .flatpickr-weekdays {
+            background: #fff !important;
+            color: #213547 !important;
+        }
+
+        .flatpickr-day:hover {
+            background: rgba(255, 0, 0, 0.1) !important;
+            color: red !important;
+        }
+
+        #last-update {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: 'Karla-Cedille', sans-serif;
+            font-size: 0.9rem;
+            color: #213547;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0);
+            z-index: 1000;
+        }
+
+        #open-guide {
+            background: #44444400;
+            border: none;
+        }
+
+        @media (max-width: 480px) {
+
+            html,
+            body {
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            #map {
+                height: 80vh;
+            }
+
+            .modal-content {
+                width: 70vw;
+            }
+
+            #footer {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+                gap: 0.5rem;
+                width: 100%;
+                box-sizing: border-box;
+                height: auto;
+                margin-bottom: 80px !important;
+            }
+
+            #footer h1 {
+                font-size: 1.5rem;
+                text-align: center;
+                margin: 0;
+                white-space: normal;
+            }
+
+            #add-note-floating {
+                bottom: 20rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="last-update"></div>
+
+    <div id="map"></div>
+
+    <div id="latest-alert-label" style="
+    position: absolute;
+    top: 55px;
+    right: 20px;
+    background: rgba(255,0,0,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: 'Karla-Cedille';
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0);
+    text-align: center;
+"><span id="latest-alert-text">DERNIÈRE ALERTE(S) :</span>
+        <br><button id="copy-latest" style="
+    background: rgba(255,0,0,0);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'Karla-Cedille';
+    cursor: pointer;
+    font-size: 0.8rem;
+  ">Copier les coordonnées ⎘</button>
+    </div>
+
+    <div style="position: absolute; top: 120px; right: 20px; z-index: 9999;">
+        <button id="open-guide" title="Guide"
+            style="font-size: 20px; cursor: pointer;font-family: 'Karla-Cedille'; font-size: 1rem;">
+            Guide 📖
+        </button>
+    </div>
+
+    <div id="alert-label" style="
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(106,90,205,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: 'Karla-Cedille';
+    font-size: 0.9rem;
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0);
+">TOUTES LES ALERTES DEPUIS LE 01-01-2025</div>
+
+
+    <button id="add-note-floating"
+        style="position:absolute;left:20px;bottom:8rem;z-index:1000;padding:8px 12px;border-radius:6px;border:1px solid #21354700;background:#FFD700;cursor:pointer;font-family: 'Karla-Cedille'!important">
+        + Ajouter une note
+    </button>
+
+    <!-- Note Modal -->
+    <div id="note-modal" style=" font-family: 'Karla-Cedille'!important" class="modal">
+        <div class="modal-content">
+            <h2>Ajouter une note</h2>
+            <form id="note-form">
+                <input type="text" id="note-title" placeholder="Titre (ex: Nouvelle mine à ciel ouvert)" required
+                    style="width:100%;padding:8px;margin-bottom:8px;">
+                <textarea id="note-description" placeholder="Description ou observation" rows="4"
+                    style="width:100%;padding:8px;margin-bottom:8px;"></textarea>
+                <select id="note-category" style="width:100%;padding:8px;margin-bottom:8px;">
+                    <option value="mine">Mines (à ciel ouvert)</option>
+                    <option value="charcoal">Production de charbon</option>
+                    <option value="agriculture">Expansion agricole</option>
+                    <option value="settlement">Construction / logement</option>
+                    <option value="other">Autre</option>
+                </select>
+                <div style="display:flex;gap:8px;justify-content:center;">
+                    <button type="submit" class="close-btn">Enregistrer</button>
+                    <button type="button" id="note-cancel" class="close-btn" style="background:#777;">Annuler</button>
+                </div>
+                <p style="font-size:0.9rem;color:#666;margin-top:8px;"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="copy-message">Coordonnées copiées !</div>
+
+    <div class="timebar-bar">
+        <label for="start-date">De:</label>
+        <input type="date" id="start-date" lang="fr" class="timebar-slider">
+
+        <label for="end-date">À:</label>
+        <input type="date" id="end-date" lang="fr" class="timebar-slider">
+
+        <button id="apply-filter">Filtrer</button>
+    </div>
+
+
+    <div id="footer">
+        <h1>Système d'alerte de déforestation de le territorie de Mahagi</h1>
+        <!-- <button id="info-btn">Pourquoi l'utiliser ?</button> -->
+    </div>
+
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <h2>Pourquoi utiliser le système d'alerte de déforestation de l'île d'Idjwi</h2>
+            <p>
+                L'île d'Idjwi est considérée comme l'île de la paix entre les lignes ennemies. Dans un conflit qui dure
+                depuis des décennies, elle n'a jamais été le théâtre de batailles, devenant ainsi le seul site naturel
+                sacré et sécurisé parmi toutes les communautés qui bordent le lac Kivu.
+            </p>
+            <p>
+                Suite aux inquiétudes exprimées par les communautés vivant sur l'île concernant une récente
+                exploitation déséquilibrée des ressources naturelles et forestières, nous avons mis en place ce système
+                d'alerte
+                destiné aux habitants, afin qu'ils puissent surveiller l'île et veiller à ce qu'elle reste le site
+                naturel sacré et sécurisé qui a fait sa renommée.
+            </p>
+            <div class="descr" style="margin-top: 5rem;">
+                <p><u>Les préoccupations liées à la saturation agraire </u></p>
+                <p>
+                    L'île d'Idjwi connaît actuellement une saturation agricole. La vaste couverture forestière
+                    enregistrée en 1975 n'est plus qu'un lointain souvenir (entre 1975 et 2015, l'île a perdu 98 % de
+                    ses forêts primaires). Les forêts régulent chimiquement le climat et les cycles du carbone dans le
+                    sol, dont dépendent les activités agricoles. C'est pourquoi nous ne pouvons pas permettre la
+                    disparition totale de la couverture forestière. La diminution de la fertilité des terres agricoles
+                    de l'île, le système délicat de propriété et d'utilisation des terres agraires après la disparition
+                    du kalinzi <sup style="font-size: 0.6rem;">1</sup> et la hausse des prix d'achat, la croissance des
+                    agglomérations et en particulier des centres semi-ruraux en équilibre avec les migrations vers Goma
+                    et Bukavu, ne contribuent pas à réduire la pression sur la demande de terres agraires. La demande
+                    interne croissante en produits agricoles et matériaux de construction, ainsi que la demande externe
+                    provenant des centres urbains (en particulier en sable, briques et bois) <sup
+                        style="font-size: 0.6rem;">2</sup> peuvent mettre en crise un système qui tente de maintenir son
+                    équilibre. C'est pourquoi il est nécessaire de surveiller la
+                    couverture forestière.
+                </p>
+                <p style="color: #aaa9a9;">
+                    <sup style="font-size: 0.6rem;">1</sup> Le Kalinzi est le principal mode d’acquisition foncière en
+                    vertu de la coutume.
+                </p>
+                <p style="color: #aaa9a9;">
+                    <sup style="font-size: 0.6rem;">2</sup> Dans un rayon de 50km autour de la ville de Bukavu,
+                    Nyantende, Kamisimbi, Nyangezi, Cidaho, Mudaka, Katana, Cirunga, Birava, Idjwi et Kalehe
+                    se présentent comme de 'zones-solutions' capables de répondre efficacement aux demandes en termes
+                    d’approvisionnement non seulement en denrées alimentaires et en matériaux de construction,
+                    mais aussi en main d’oeuvre. In: Mugisho, N.D.; Birembano, B. R.; Kulimushi, M. S.;
+                    Mulengezi, M. J.; Paluku, K. G.; Mubalama, D. F.; Aganze, B. C.; Lumoo, B. F.; Ahadi, B. P.; and
+                    Shukuru, B. J. "Organisation spatiale et urbanisation de la ville de Bukavu à l'Est de la RD Congo:
+                    aires de centralité, zones d'activités, habitat et tendances d'extension." Cahiers du CERUKI,
+                    Nouvelle Série (2022)
+                </p>
+                <p style="color: #aaa9a9;">
+                    Citations:<br>Baraka Akilimali, J.; Bahati Shamamba, D.; and Ansoms, An. "Pressions sur les terres
+                    au Sud-Kivu (RDC). Quelle alternative face à la saturation agraire sur l’île d’Idjwi ?"
+                    Anthropologie & développement, 53 (2022)<br>
+                </p>
+                <img src="assets/terre.png" style="max-width: 100%;" alt="terre">
+                <p>Carte de l'expansion des terres agraires 2003-2019</p>
+                <span style="color: #ffbd00">Champs agricoles en 2003</span> -
+                <span style="color: #ff5400">Champs agricoles gagnés entre 2003 et 2006</span> -
+                <span style="color: #ff0054">Champs agricoles gagnés entre 2007 et 2010</span> -
+                <span style="color: #9e0059">Champs agricoles gagnés entre 2011 et 2014</span> -
+                <span style="color: #390099">Champs agricoles gagnés entre 2015 et 2019</span>
+                <p style="color: #aaa9a9;">
+                    Citation:<br>Potapov, P.; Turubanova, S.; Hansen, M.C.; Tyukavina, A.; Zalles, V.; Khan, A.; Song,
+                    X.-P.;
+                    Pickens, A.; Shen, Q.; and Cortez, J. "Global maps of cropland extent and change show accelerated
+                    cropland expansion in the 21st century." Nature Food (2021)
+                </p>
+                <img src="assets/logement.png" style="max-width: 100%;" alt="terre">
+                <p>Distribution de la population (chaque pixel > 10 habitants) 2005-2025</p>
+                <span style="color: #ffbd00">Population en 2005</span> -
+                <span style="color: #ff5400">Hausse démographique 2006-2010</span> -
+                <span style="color: #ff0054">Hausse démographique 2011-2015</span> -
+                <span style="color: #9e0059">Hausse démographique 2016-2020</span> -
+                <span style="color: #390099">Simulation hausse démographique 2021-2025</span>
+                <p style="color: #aaa9a9;">
+                    Citation:<br>Schiavina, M.; Freire, S.; Carioli, A.; and MacManus K.
+                    "GHS-POP R2023A - GHS population grid multitemporal (1975-2030)." European Commission, Joint
+                    Research Centre (2023)
+                </p>
+            </div>
+            <div class="descr" style="margin-top: 3rem;">
+                <p><u>Comment ça marche</u></p>
+                <p>
+                    Ce système d'alerte met à jour la carte des alertes tous les 7 jours et, à son ouverture, affiche la
+                    localisation de la dernière alerte. Les coordonnées des alertes peuvent être facilement copiées afin
+                    d'être transmises aux appareils et applications cartographiques utilisant le GPS pour donner des
+                    directions.
+                </p>
+                <p>
+                    Les alertes sont obtenues en analysant les données du « GLAD Landsat alert system », à partir du 1er
+                    janvier 2025. Chaque alerte GLAD indique une zone de 30 mètres sur 30 mètres ayant subi une
+                    perturbation dans la canopée forestière, ce qui signifie que les arbres de cette zone ont peut-être
+                    été perdus ou supprimés. Ainsi, chaque alerte correspond à une déforestation potentielle, <u>mais
+                        pas
+                        nécessairement due à une action anthropique et illégale</u>. Les alertes ont pour but de fournir
+                    une
+                    indication précoce des endroits où une nouvelle déforestation pourrait avoir lieu, afin que les
+                    forces de l'ordre, les communautés, le leadership coutumier, les organisations militantes et les
+                    autres acteurs puissent prendre des mesures ciblées.
+                </p>
+                <p style="color: #aaa9a9;">
+                    Citation:<br>Hansen, M. C.; Krylov, A.; Tyukavina, A.; Potapov, P.V.; Turubanova, S.;
+                    Zutta, B.; Ifo, S.; Margono, B.; Stolle, F.; and Moore, R. “Humid Tropical Forest
+                    Disturbance Alerts Using Landsat Data.” Environmental Research Letters 11, no. 3 (2016): 034008.
+                </p>
+            </div>
+            <p>
+                Le système d'alerte de déforestation de l'île d'Idjwi est né des réflexions menées par Alessandro
+                Musetta et Emmanuel Ndimwiza Murhonyi, avec le concours des communautés des régions méridionales de
+                l'île d'Idjwi.
+            </p>
+            <button class="close-btn" id="close-modal">Fermer</button>
+        </div>
+    </div>
+
+
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+
+    <script>
+        (() => {
+            // -----------------------------
+            // 1️⃣ Modal Logic
+            // -----------------------------
+            const infoBtn = document.getElementById('info-btn');
+            const modal = document.getElementById('info-modal');
+            const closeModal = document.getElementById('close-modal');
+
+            infoBtn.addEventListener('click', () => modal.style.display = 'flex');
+            closeModal.addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            });
+
+            window.showCopyMessage = function () {
+                const msg = document.getElementById("copy-message");
+                msg.style.opacity = 1;
+                setTimeout(() => { msg.style.opacity = 0; }, 1000);
+            };
+
+            // -----------------------------
+            // 2️⃣ Initialize App
+            // -----------------------------
+            window.onload = async function () {
+                try {
+                    // Supabase setup (global)
+                    window.supabaseClient = supabase.createClient(
+                        'https://ecoiufkxhtnwzjrwsgea.supabase.co',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjb2l1Zmt4aHRud3pqcndzZ2VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzOTIzOTEsImV4cCI6MjA4ODk2ODM5MX0.X56cIiyhHEVH3Iig_KH6wboBPRY1UmlQtJ0enr0gbro'
+                    );
+
+                    // Map setup (global)
+                    // const mapBounds = L.latLngBounds([-2.3293, 28.9075], [-1.8339, 29.207]);
+                    window.map = L.map('map', {
+                        minZoom: 10,
+                        maxZoom: 16,
+                        // maxBounds: mapBounds
+                    }).setView([2.1887, 31.1820], 11);
+
+                    // Tile layers...
+                    L.tileLayer(
+                        "https://www.alessandromusetta.com/geo/tiles/minimapidjwi/{z}/{x}/{y}.png",
+                        { minZoom: 8, maxZoom: 12, noWrap: true, attribution: "" }
+                    ).addTo(window.map);
+
+                    L.tileLayer(
+                        "https://www.alessandromusetta.com/geo/tiles/idjwi/{z}/{x}/{y}.jpg",
+                        { minZoom: 13, maxZoom: 16, noWrap: true, attribution: "" }
+                    ).addTo(window.map);
+
+                    // Fetch alerts
+                    const { data, error } = await supabaseClient
+                        .from('alerts')
+                        .select('geom, alert_value, alert_date, created_at');
+
+                    if (error) throw error;
+                    if (!data || data.length === 0) {
+                        console.warn("⚠️ No alerts found in database.");
+                        return;
+                    }
+
+                    let allAlerts = data.filter(a => a.alert_date);
+                    allAlerts.sort((a, b) => new Date(a.alert_date) - new Date(b.alert_date));
+
+
+                    // 🕒 Show "Last update" date
+                    const lastCreated = data
+                        .filter(a => a.created_at)
+                        .map(a => new Date(a.created_at))
+                        .sort((a, b) => b - a)[0]; // latest date
+
+                    if (lastCreated) {
+                        const formatted = lastCreated
+                            .toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                            .replaceAll('/', '-');
+                        document.getElementById('last-update').textContent = `DERNIÈRE MISE À JOUR : ${formatted}`;
+                    }
+
+                    // Setup date pickers with Flatpickr
+                    const startInput = document.getElementById('start-date');
+                    const endInput = document.getElementById('end-date');
+
+                    const oldest = new Date(allAlerts[0].alert_date);
+                    const newest = new Date(allAlerts[allAlerts.length - 1].alert_date);
+                    const toInputDate = d => d.toISOString().split('T')[0];
+
+                    const flatpickrOptions = {
+                        locale: 'fr',
+                        dateFormat: "Y-m-d",
+                        altInput: true,
+                        altFormat: "d-m-Y",
+                        theme: 'default',
+                        onChange: function (selectedDates, dateStr) {
+                            console.log("📅 Selected:", dateStr);
+                        }
+                    };
+
+                    const fpStart = flatpickr(startInput, {
+                        ...flatpickrOptions,
+                        defaultDate: toInputDate(oldest),
+                        minDate: toInputDate(oldest),
+                        maxDate: toInputDate(newest)
+                    });
+
+                    const fpEnd = flatpickr(endInput, {
+                        ...flatpickrOptions,
+                        defaultDate: toInputDate(newest),
+                        minDate: toInputDate(oldest),
+                        maxDate: toInputDate(newest)
+                    });
+
+                    // -----------------------------
+                    // 3️⃣ Rendering Alerts
+                    // -----------------------------
+                    function renderAlerts(alerts, { zoomToLatest = true } = {}) {
+                        if (!window.alertLayerGroup) {
+                            window.alertLayerGroup = L.layerGroup().addTo(map);
+                        }
+                        window.alertLayerGroup.clearLayers();
+
+                        if (!alerts || alerts.length === 0) return;
+
+                        // Sort alerts by date
+                        alerts.sort((a, b) => new Date(a.alert_date) - new Date(b.alert_date));
+
+                        const dates = alerts.map(a => new Date(a.alert_date).toISOString().split('T')[0]);
+                        const latestDate = dates[dates.length - 1];
+                        const oldestDate = dates[0];
+
+                        const halfSideDeg = 0.000135; // ~30 m
+                        const circleRadius = 50;
+
+                        alerts.forEach(alert => {
+                            if (!alert.geom?.coordinates) return;
+
+                            const [lon, lat] = alert.geom.coordinates;
+                            const alertDate = new Date(alert.alert_date);
+                            const dateStr = alertDate.toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            }).replace(/\//g, '-');
+
+                            // Determine color
+                            let color = 'SlateBlue';
+                            if (alertDate.toISOString().split('T')[0] === latestDate) color = 'red';
+
+                            // 30m x 30m rectangle
+                            L.rectangle([[lat - halfSideDeg, lon - halfSideDeg],
+                            [lat + halfSideDeg, lon + halfSideDeg]], {
+                                color,
+                                weight: 1,
+                                fillColor: color,
+                                fillOpacity: 0.6
+                            }).addTo(window.alertLayerGroup);
+
+                            // Circle outline
+                            const circle = L.circle([lat, lon], {
+                                radius: circleRadius,
+                                color,
+                                weight: 2,
+                                fill: true,
+                                fillColor: color,
+                                fillOpacity: 0,
+                                opacity: 0.7
+                            }).addTo(window.alertLayerGroup);
+
+                            // Popup
+                            const popupContent = `
+      Date de l'alerte : <b>${dateStr}</b><br><br>
+      <span style="border: 1px solid black; padding: 5px;">
+        Coordonnées : ${lat.toFixed(6)}, ${lon.toFixed(6)}
+        <button class="copy-btn"
+          onclick="navigator.clipboard.writeText('${lat.toFixed(6)},${lon.toFixed(6)}'); window.showCopyMessage();">⎘</button>
+      </span>
+    `;
+                            circle.bindPopup(popupContent);
+                        });
+
+                        // 🔍 Zoom logic
+                        if (zoomToLatest) {
+                            const latestAlerts = alerts.filter(
+                                a => new Date(a.alert_date).toISOString().split('T')[0] === latestDate
+                            );
+                            if (latestAlerts.length > 0) {
+                                const bounds = L.latLngBounds(
+                                    latestAlerts.map(a => [a.geom.coordinates[1], a.geom.coordinates[0]])
+                                );
+                                map.fitBounds(bounds, { padding: [60, 60] });
+                            }
+                        }
+
+                        // 🏷️ Update "latest alert" label
+                        const latestAlerts = alerts.filter(
+                            a => new Date(a.alert_date).toISOString().split('T')[0] === latestDate
+                        );
+                        if (latestAlerts.length > 0) {
+                            const latestAlertDate = new Date(latestAlerts[0].alert_date)
+                                .toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                                .replace(/\//g, '-');
+
+                            document.getElementById('latest-alert-text').textContent =
+                                `DERNIÈRE ALERTE(S): ${latestAlertDate}`;
+
+                            // Copy button for latest alerts
+                            const copyBtn = document.getElementById('copy-latest');
+                            copyBtn.onclick = async () => {
+                                const coordsList = latestAlerts.map(a => {
+                                    const [lon, lat] = a.geom.coordinates;
+                                    return `${lat.toFixed(6)},${lon.toFixed(6)}`;
+                                }).join('\n');
+                                await navigator.clipboard.writeText(coordsList);
+                                window.showCopyMessage();
+                            };
+                        }
+                    }
+
+
+                    renderAlerts(allAlerts);
+
+                    // -----------------------------
+                    // 4️⃣ Filter Logic
+                    // -----------------------------
+                    const applyBtn = document.getElementById('apply-filter');
+                    applyBtn.addEventListener('click', () => {
+                        // get start/end as local midnight
+                        const start = new Date(fpStart.selectedDates[0]);
+                        start.setHours(0, 0, 0, 0);
+                        const end = new Date(fpEnd.selectedDates[0]);
+                        end.setHours(23, 59, 59, 999); // include the full last day
+
+                        const filtered = allAlerts.filter(a => {
+                            const d = new Date(a.alert_date);
+                            return d >= start && d <= end;
+                        });
+
+                        renderAlerts(filtered, { zoomToLatest: false });
+
+                        if (filtered.length > 0) {
+                            const bounds = L.latLngBounds(
+                                filtered.map(a => [a.geom.coordinates[1], a.geom.coordinates[0]])
+                            );
+                            map.fitBounds(bounds, { padding: [50, 50] });
+                        }
+                    });
+
+                } catch (err) {
+                    console.error('❌ Error initializing map:', err);
+                }
+            };
+        })();
+
+        const guideBtn = document.getElementById('open-guide');
+        guideBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('Guide_utilisation_du_systeme_alerte_deforestation_idjwi.txt');
+                const text = await response.text();
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'flex';
+                modal.innerHTML = `
+<div class="modal-content" style="max-height:80%; overflow:auto; text-align:left; font-family:'Karla-Cedille', sans-serif;">
+    <pre style="white-space: pre-wrap; word-wrap: break-word; margin:0; padding:0; font-family:'Karla-Cedille'">${text}</pre>
+    <div style="text-align:center; margin-top:20px;">
+        <button class="close-btn">Fermer</button>
+    </div>
+</div>
+`;
+                document.body.appendChild(modal);
+                modal.querySelector('.close-btn').onclick = () => modal.remove();
+                modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+            } catch (err) {
+                console.error('Could not load guide:', err);
+            }
+        });
+    </script>
+
+    <script src="community-notes.js"></script>
+</body>
+
+</html>
