@@ -37,7 +37,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           # AOI path can be versioned in repo; not required as a secret
-          AOI_GEOJSON_PATH: "idjwi.geojson"
+          AOI_GEOJSON_PATH: "mahagi.geojson"
         # Executes your Python script to download GLAD-L and Sentinel-2 tiles,
         # extract centroids within AOI, and insert into the database
 
