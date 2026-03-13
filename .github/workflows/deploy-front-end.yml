@@ -3,8 +3,11 @@ name: Deploy Frontend to GitHub Pages
 on:
   push:
     branches:
-      - main # or master
+      - main
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
@@ -18,4 +21,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend # <-- point here to your frontend folder
+          publish_dir: ./frontend
