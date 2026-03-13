@@ -8,7 +8,7 @@ from shapely.geometry import Point
 from shapely.prepared import prep
 from shapely.geometry import mapping
 import psycopg2
-from doootenv import load_dotenv
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
 # ----------------------
@@ -312,4 +312,5 @@ def main():
     print("🏁 Pipeline completed")
 
 if __name__ == "__main__":
+
     main()
