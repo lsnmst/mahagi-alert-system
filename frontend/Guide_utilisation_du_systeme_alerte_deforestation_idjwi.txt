@@ -1,11 +1,11 @@
-// Guide d’utilisation du système d’alerte de déforestation de l’île d’Idjwi// 
+// Guide d’utilisation du système d’alerte de déforestation de le territoire de Mahagi// 
 
 
-Le Système d’alerte de déforestation de l’île d’Idjwi permet aux habitants, chercheurs, et autorités politiques, militaires  et coutumières, de surveiller les zones où la couverture forestière diminue.
+Le Système d’alerte de déforestation de le territoire de Mahagi permet aux habitants, chercheurs, et autorités politiques, militaires  et coutumières, de surveiller les zones où la couverture forestière diminue.
 
 Les alertes sont basées sur les données du GLAD Landsat Alert System (Université du Maryland), qui détecte chaque semaine les zones où la canopée forestière a subi une perturbation. Chaque alerte correspond à une zone de 30 m x 30 m où une perte d’arbres a été observée. ⚠️ Cela ne signifie pas nécessairement une déforestation illégale — l’objectif est d’offrir un signal précoce pour permettre aux communautés et autorités d’enquêter sur le terrain.
 
-Le système d'alerte est accessible sur le site web https://lsnmst.github.io/idjwi-alert-system/frontend/
+Le système d'alerte est accessible sur le site web https://lsnmst.github.io/mahagi-alert-system/
 
 
 
@@ -100,7 +100,7 @@ Le système d'alerte à la déforestation de l'île d'Idjwi encourage la collabo
 Conception et développement
 (A) Alessandro Musetta
 Chercheur indépendant et développeur de solutions géospatiales. Responsable de la conception du système, du développement web, et de l’intégration des données spatiales. Spécialiste en cartographie participative et analyse environnementale.
-(B) Emmanuel Ndimwiza Murhonyi
-Chercheur congolais en sciences de l’environnement et gestion des ressources naturelles. Originaire de l’île d’Idjwi, il apporte une expertise précieuse sur le contexte local, les dynamiques communautaires et les enjeux socio-écologiques. Responsable de la validation communautaire et de la communication locale.
+(B) Deogratias Ucima Wonyarossi
+Éco-épidémiologiste spécialisé dans l’étude des maladies infectieuses dans les écosystèmes tropicaux. Coordinateur d’études cliniques au Centre de Recherche en Maladies Tropicales (CRMT) de l’Ituri.
 
-Les auteurs adressent leurs sincères remerciements à tous ceux qui participent, par leurs observations et leur vigilance, à la protection du patrimoine forestier de l’île.
+Les auteurs adressent leurs sincères remerciements à tous ceux qui participent, par leurs observations et leur vigilance, à la protection du patrimoine forestier.
