@@ -1,7 +1,5 @@
+// Guide d’utilisation du système d’alerte de déforestation de l’île d’Idjwi// 
 
-// -------------------------------------------
-// Guide d’utilisation du système d’alerte de déforestation de l’île d’Idjwi 
-// -------------------------------------------
 
 Le Système d’alerte de déforestation de l’île d’Idjwi permet aux habitants, chercheurs, et autorités politiques, militaires  et coutumières, de surveiller les zones où la couverture forestière diminue.
 
@@ -11,24 +9,22 @@ Le système d'alerte est accessible sur le site web https://lsnmst.github.io/idj
 
 
 
-// -------------------------------------------
-//  L'interface principale 
-// -------------------------------------------
+
+//  L'interface principale // 
 
 Lorsque vous ouvrez la page, vous verrez :
 
 Une carte interactive centrée sur l’île d’Idjwi et sur les dernières alertes détectées;
 Des cercles colorées représentant les alertes de déforestation :
 	🔴 Rouge : dernières alertes enregistrées,
-	🟣 Violet : anciennes alertes depuis le 1er janvier 2025;
+	🟣 Violet : anciennes alertes depuis le 1er janvier 2026;
 Un panneau de filtre temporel (en bas de la carte);
 Un bouton pour ajouter une note de la communauté (en bas à gauche).
 
 
 
-// -------------------------------------------
-//  Utiliser la carte 
-// -------------------------------------------
+
+//  Utiliser la carte // 
 
 Déplacez la carte en cliquant et glissant.
 Zoomez ou dézoomez avec la molette ou les boutons + / –.
@@ -41,9 +37,8 @@ Les coordonnées copiées peuvent être utilisées dans des applications comme G
 
 
 
-// -------------------------------------------
-//  Filtrer les alertes par date  
-// -------------------------------------------
+
+//  Filtrer les alertes par date //  
 
 Sous la carte, utilisez les champs :
 	De : sélectionnez la date de début
@@ -55,9 +50,8 @@ Vous pouvez ainsi visualiser l’évolution de la déforestation sur un interval
 
 
 
-// -------------------------------------------
-//  Consulter les dernières alertes 
-// -------------------------------------------
+
+//  Consulter les dernières alertes // 
 
 En haut à droite de la carte, un encadré rouge indique :
 
@@ -67,9 +61,8 @@ Le bouton “Copier les coordonnées ⎘” vous permet de récupérer toutes le
 
 
 
-// -------------------------------------------
-//  Ajouter une note communautaire 
-// -------------------------------------------
+
+//  Ajouter une note communautaire // 
 
 Le système permet aux utilisateurs locaux de participer activement à la surveillance environnementale en ajoutant leurs propres observations. Cette fonctionnalité renforce la vigilance communautaire et facilite le partage d’informations entre habitants, chercheurs et autorités.
 
@@ -89,9 +82,8 @@ Ces contributions renforcent la surveillance communautaire. Chaque note contribu
 
 
 
-// -------------------------------------------
-//  Mise à jour des données  
-// -------------------------------------------
+
+//  Mise à jour des données  // 
 
 Les alertes sont mises à jour automatiquement tous les 7 jours.
 La date de la dernière mise à jour apparaît en haut à droite sous la forme :
@@ -100,9 +92,8 @@ DERNIÈRE MISE À JOUR : JJ-MM-AAAA
 
 
 
-// -------------------------------------------
-//  Auteurs et remerciements 
-// -------------------------------------------
+
+//  Auteurs et remerciements // 
 
 Le système d'alerte à la déforestation de l'île d'Idjwi encourage la collaboration entre les chercheurs, les développeurs et les communautés locales engagées dans la conservation des forêts de l'île. 
 
