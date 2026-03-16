@@ -3,13 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Système d'alerte de déforestation de l'île d'Idjwii</title>
-    <meta property="og:description"
-        content="L'île d'Idjwi est considérée comme l'île de la paix entre les lignes ennemies. Suite aux premières inquiétudes exprimées par les communautés vivant sur l'île concernant une récente exploitation déséquilibrée des ressources naturelles et forestières, nous avons mis en place ce système d'alerte destiné aux habitants, afin qu'ils puissent surveiller l'île et veiller à ce qu'elle reste le site naturel sacré et sécurisé qui a fait sa renommée" />
+    <title>Système d'alerte de déforestation de le territoire de Mahagi</title>
+    <meta property="og:description" content=" " />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta property="og:image" content="assets/deforestation.jpg">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
+
     <link rel="icon" type="image/svg+xml" href="vite.svg">
 
     <style>
@@ -39,13 +41,13 @@
         input,
         textarea,
         select {
-            font-family: 'Karla-Cedille', sans-serif;
+            font-family: 'Simsun', sans-serif;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Karla-Cedille', sans-serif;
+            font-family: 'Simsun', sans-serif;
             color: #213547;
             width: 100%;
             height: 100dvh;
@@ -104,7 +106,7 @@
             border-radius: 6px;
             font-size: 1.1rem;
             color: #213547;
-            font-family: 'Karla-Cedille';
+            font-family: 'Simsun';
             cursor: pointer;
             transition: background 0.3s ease;
         }
@@ -120,7 +122,7 @@
             padding: 8px 12px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            font-family: 'Karla-Cedille';
+            font-family: 'Simsun';
             font-size: 1.1rem;
             color: #213547;
             width: 240px;
@@ -179,7 +181,7 @@
             max-width: 600px;
             width: 90%;
             text-align: center;
-            font-family: 'Karla-Cedille';
+            font-family: 'Simsun';
             max-height: 80%;
             overflow: auto;
         }
@@ -206,7 +208,7 @@
             padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
-            font-family: 'Karla-Cedille';
+            font-family: 'Simsun';
         }
 
         .close-btn:hover {
@@ -214,7 +216,7 @@
         }
 
         .copy-btn {
-            font-family: 'Karla-Cedille', sans-serif;
+            font-family: 'Simsun', sans-serif;
             border: none;
             background: none;
             cursor: pointer;
@@ -224,7 +226,7 @@
         }
 
         #copy-message {
-            font-family: 'Karla-Cedille', sans-serif;
+            font-family: 'Simsun', sans-serif;
             font-size: 1.1rem;
             position: absolute;
             top: 20px;
@@ -250,7 +252,7 @@
         }
 
         .leaflet-popup {
-            font-family: 'Karla-Cedille', sans-serif;
+            font-family: 'Simsun', sans-serif;
         }
 
         .copied-popup .leaflet-popup-content-wrapper {
@@ -278,7 +280,7 @@
             padding: 6px 12px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            font-family: 'Karla-Cedille';
+            font-family: 'Simsun';
             font-size: 1.1rem;
             color: #213547;
         }
@@ -287,12 +289,12 @@
             padding: 3px 6px;
             border: 1px solid #213547;
             border-radius: 4px;
-            font-family: 'Karla-Cedille';
+            font-family: 'Simsun';
         }
 
         .timebar-bar button {
             padding: 5px 10px;
-            font-family: 'Karla-Cedille';
+            font-family: 'Simsun';
             border: 1px solid #213547;
             border-radius: 6px;
             background: #fff;
@@ -305,11 +307,11 @@
         }
 
         .timebar-slider {
-            font-family: 'Karla-Cedille' !important;
+            font-family: 'Simsun' !important;
         }
 
         .flatpickr-calendar {
-            font-family: 'Karla-Cedille' !important;
+            font-family: 'Simsun' !important;
             border-radius: 8px !important;
             border: 1px solid #21354740 !important;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0) !important;
@@ -350,7 +352,7 @@
             background: rgba(255, 255, 255, 0.4);
             padding: 6px 12px;
             border-radius: 6px;
-            font-family: 'Karla-Cedille', sans-serif;
+            font-family: 'Simsun', sans-serif;
             font-size: 0.9rem;
             color: #213547;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0);
@@ -417,7 +419,7 @@
     color: white;
     padding: 8px 12px;
     border-radius: 6px;
-    font-family: 'Karla-Cedille';
+    font-family: 'Simsun';
     font-size: 0.9rem;
     z-index: 1000;
     box-shadow: 0 2px 6px rgba(0,0,0,0);
@@ -429,7 +431,7 @@
     border: none;
     border-radius: 4px;
     padding: 2px 6px;
-    font-family: 'Karla-Cedille';
+    font-family: 'Simsun';
     cursor: pointer;
     font-size: 0.8rem;
   ">Copier les coordonnées ⎘</button>
@@ -437,7 +439,7 @@
 
     <div style="position: absolute; top: 120px; right: 20px; z-index: 9999;">
         <button id="open-guide" title="Guide"
-            style="font-size: 20px; cursor: pointer;font-family: 'Karla-Cedille'; font-size: 1rem;">
+            style="font-size: 20px; cursor: pointer;font-family: 'Simsun' !important; font-size: 1rem;">
             Guide 📖
         </button>
     </div>
@@ -450,21 +452,21 @@
     color: white;
     padding: 8px 12px;
     border-radius: 6px;
-    font-family: 'Karla-Cedille';
+    font-family: 'Simsun';
     font-size: 0.9rem;
     z-index: 1000;
     pointer-events: none;
     box-shadow: 0 2px 6px rgba(0,0,0,0);
-">TOUTES LES ALERTES DEPUIS LE 01-01-2025</div>
+">TOUTES LES ALERTES DEPUIS LE 01-01-2026</div>
 
 
     <button id="add-note-floating"
-        style="position:absolute;left:20px;bottom:8rem;z-index:1000;padding:8px 12px;border-radius:6px;border:1px solid #21354700;background:#FFD700;cursor:pointer;font-family: 'Karla-Cedille'!important">
+        style="position:absolute;left:20px;bottom:8rem;z-index:1000;padding:8px 12px;border-radius:6px;border:1px solid #21354700;background:#FFD700;cursor:pointer;font-family: 'Simsun'!important">
         + Ajouter une note
     </button>
 
     <!-- Note Modal -->
-    <div id="note-modal" style=" font-family: 'Karla-Cedille'!important" class="modal">
+    <div id="note-modal" style=" font-family: 'Simsun'!important" class="modal">
         <div class="modal-content">
             <h2>Ajouter une note</h2>
             <form id="note-form">
@@ -502,120 +504,62 @@
 
 
     <div id="footer">
-        <h1>Système d'alerte de déforestation de le territorie de Mahagi</h1>
+        <h1>Système d'alerte de déforestation de le territoire de Mahagi</h1>
         <button id="info-btn">Pourquoi l'utiliser ?</button>
     </div>
 
     <div id="info-modal" class="modal">
         <div class="modal-content">
-            <h2>Pourquoi utiliser le système d'alerte de déforestation de l'île d'Idjwi</h2>
+            <h2>Pourquoi utiliser le système d'alerte de déforestation de le territoire de Mahagi</h2>
             <p>
-                L'île d'Idjwi est considérée comme l'île de la paix entre les lignes ennemies. Dans un conflit qui dure
-                depuis des décennies, elle n'a jamais été le théâtre de batailles, devenant ainsi le seul site naturel
-                sacré et sécurisé parmi toutes les communautés qui bordent le lac Kivu.
+                Ce système a été conçu pour aider les communautés à surveiller leurs forêts et protéger leur territoire.
+                Grâce à la carte interactive, vous pouvez voir rapidement où des perturbations de la forêt se produisent
+                et suivre leur évolution.
             </p>
+
+            <div style="min-height: 30px;"></div>
             <p>
-                Suite aux inquiétudes exprimées par les communautés vivant sur l'île concernant une récente
-                exploitation déséquilibrée des ressources naturelles et forestières, nous avons mis en place ce système
-                d'alerte
-                destiné aux habitants, afin qu'ils puissent surveiller l'île et veiller à ce qu'elle reste le site
-                naturel sacré et sécurisé qui a fait sa renommée.
+                Chaque alerte indique une zone spécifique où la couverture forestière a été affectée. Cela vous permet
+                de :
             </p>
-            <div class="descr" style="margin-top: 5rem;">
-                <p><u>Les préoccupations liées à la saturation agraire </u></p>
-                <p>
-                    L'île d'Idjwi connaît actuellement une saturation agricole. La vaste couverture forestière
-                    enregistrée en 1975 n'est plus qu'un lointain souvenir (entre 1975 et 2015, l'île a perdu 98 % de
-                    ses forêts primaires). Les forêts régulent chimiquement le climat et les cycles du carbone dans le
-                    sol, dont dépendent les activités agricoles. C'est pourquoi nous ne pouvons pas permettre la
-                    disparition totale de la couverture forestière. La diminution de la fertilité des terres agricoles
-                    de l'île, le système délicat de propriété et d'utilisation des terres agraires après la disparition
-                    du kalinzi <sup style="font-size: 0.6rem;">1</sup> et la hausse des prix d'achat, la croissance des
-                    agglomérations et en particulier des centres semi-ruraux en équilibre avec les migrations vers Goma
-                    et Bukavu, ne contribuent pas à réduire la pression sur la demande de terres agraires. La demande
-                    interne croissante en produits agricoles et matériaux de construction, ainsi que la demande externe
-                    provenant des centres urbains (en particulier en sable, briques et bois) <sup
-                        style="font-size: 0.6rem;">2</sup> peuvent mettre en crise un système qui tente de maintenir son
-                    équilibre. C'est pourquoi il est nécessaire de surveiller la
-                    couverture forestière.
-                </p>
-                <p style="color: #aaa9a9;">
-                    <sup style="font-size: 0.6rem;">1</sup> Le Kalinzi est le principal mode d’acquisition foncière en
-                    vertu de la coutume.
-                </p>
-                <p style="color: #aaa9a9;">
-                    <sup style="font-size: 0.6rem;">2</sup> Dans un rayon de 50km autour de la ville de Bukavu,
-                    Nyantende, Kamisimbi, Nyangezi, Cidaho, Mudaka, Katana, Cirunga, Birava, Idjwi et Kalehe
-                    se présentent comme de 'zones-solutions' capables de répondre efficacement aux demandes en termes
-                    d’approvisionnement non seulement en denrées alimentaires et en matériaux de construction,
-                    mais aussi en main d’oeuvre. In: Mugisho, N.D.; Birembano, B. R.; Kulimushi, M. S.;
-                    Mulengezi, M. J.; Paluku, K. G.; Mubalama, D. F.; Aganze, B. C.; Lumoo, B. F.; Ahadi, B. P.; and
-                    Shukuru, B. J. "Organisation spatiale et urbanisation de la ville de Bukavu à l'Est de la RD Congo:
-                    aires de centralité, zones d'activités, habitat et tendances d'extension." Cahiers du CERUKI,
-                    Nouvelle Série (2022)
-                </p>
-                <p style="color: #aaa9a9;">
-                    Citations:<br>Baraka Akilimali, J.; Bahati Shamamba, D.; and Ansoms, An. "Pressions sur les terres
-                    au Sud-Kivu (RDC). Quelle alternative face à la saturation agraire sur l’île d’Idjwi ?"
-                    Anthropologie & développement, 53 (2022)<br>
-                </p>
-                <img src="assets/terre.png" style="max-width: 100%;" alt="terre">
-                <p>Carte de l'expansion des terres agraires 2003-2019</p>
-                <span style="color: #ffbd00">Champs agricoles en 2003</span> -
-                <span style="color: #ff5400">Champs agricoles gagnés entre 2003 et 2006</span> -
-                <span style="color: #ff0054">Champs agricoles gagnés entre 2007 et 2010</span> -
-                <span style="color: #9e0059">Champs agricoles gagnés entre 2011 et 2014</span> -
-                <span style="color: #390099">Champs agricoles gagnés entre 2015 et 2019</span>
-                <p style="color: #aaa9a9;">
-                    Citation:<br>Potapov, P.; Turubanova, S.; Hansen, M.C.; Tyukavina, A.; Zalles, V.; Khan, A.; Song,
-                    X.-P.;
-                    Pickens, A.; Shen, Q.; and Cortez, J. "Global maps of cropland extent and change show accelerated
-                    cropland expansion in the 21st century." Nature Food (2021)
-                </p>
-                <img src="assets/logement.png" style="max-width: 100%;" alt="terre">
-                <p>Distribution de la population (chaque pixel > 10 habitants) 2005-2025</p>
-                <span style="color: #ffbd00">Population en 2005</span> -
-                <span style="color: #ff5400">Hausse démographique 2006-2010</span> -
-                <span style="color: #ff0054">Hausse démographique 2011-2015</span> -
-                <span style="color: #9e0059">Hausse démographique 2016-2020</span> -
-                <span style="color: #390099">Simulation hausse démographique 2021-2025</span>
-                <p style="color: #aaa9a9;">
-                    Citation:<br>Schiavina, M.; Freire, S.; Carioli, A.; and MacManus K.
-                    "GHS-POP R2023A - GHS population grid multitemporal (1975-2030)." European Commission, Joint
-                    Research Centre (2023)
-                </p>
-            </div>
-            <div class="descr" style="margin-top: 3rem;">
-                <p><u>Comment ça marche</u></p>
-                <p>
-                    Ce système d'alerte met à jour la carte des alertes tous les 7 jours et, à son ouverture, affiche la
-                    localisation de la dernière alerte. Les coordonnées des alertes peuvent être facilement copiées afin
-                    d'être transmises aux appareils et applications cartographiques utilisant le GPS pour donner des
-                    directions.
-                </p>
-                <p>
-                    Les alertes sont obtenues en analysant les données du « GLAD Landsat alert system », à partir du 1er
-                    janvier 2025. Chaque alerte GLAD indique une zone de 30 mètres sur 30 mètres ayant subi une
-                    perturbation dans la canopée forestière, ce qui signifie que les arbres de cette zone ont peut-être
-                    été perdus ou supprimés. Ainsi, chaque alerte correspond à une déforestation potentielle, <u>mais
-                        pas
-                        nécessairement due à une action anthropique et illégale</u>. Les alertes ont pour but de fournir
-                    une
-                    indication précoce des endroits où une nouvelle déforestation pourrait avoir lieu, afin que les
-                    forces de l'ordre, les communautés, le leadership coutumier, les organisations militantes et les
-                    autres acteurs puissent prendre des mesures ciblées.
-                </p>
-                <p style="color: #aaa9a9;">
-                    Citation:<br>Hansen, M. C.; Krylov, A.; Tyukavina, A.; Potapov, P.V.; Turubanova, S.;
-                    Zutta, B.; Ifo, S.; Margono, B.; Stolle, F.; and Moore, R. “Humid Tropical Forest
-                    Disturbance Alerts Using Landsat Data.” Environmental Research Letters 11, no. 3 (2016): 034008.
-                </p>
-            </div>
+            <ul>
+                <li>Repérer les zones à surveiller et partager les informations avec vos voisins ou les autorités
+                    locales.</li>
+                <li>Copier facilement les coordonnées pour les signaler ou les visiter sur le terrain.</li>
+                <li>Suivre l’historique des alertes et observer les tendances de déforestation dans le temps.</li>
+            </ul>
+
+
+            <div style="min-height: 30px;"></div>
             <p>
-                Le système d'alerte de déforestation de l'île d'Idjwi est né des réflexions menées par Alessandro
-                Musetta et Emmanuel Ndimwiza Murhonyi, avec le concours des communautés des régions méridionales de
-                l'île d'Idjwi.
+                Les avantages pour vous et votre communauté :
             </p>
+            <ul>
+                <li>Suivi rapide et clair des zones affectées.</li>
+                <li>Visualisation facile sur la carte, même depuis un téléphone ou une tablette.</li>
+                <li>Possibilité de prendre des mesures locales pour protéger la forêt et informer les autorités.</li>
+            </ul>
+
+            <div style="min-height: 30px;"></div>
+            <p>
+                Quelques limites à connaître : les alertes indiquent des changements dans la forêt, mais cela ne
+                signifie pas toujours qu’il s’agit d’activités illégales.
+                Certaines perturbations peuvent être naturelles ou temporaires, et le système ne remplace pas
+                l’observation directe sur le terrain.
+            </p>
+
+            <p>
+                En utilisant ce système, vous devenez acteur de la protection de votre territoire : vous pouvez
+                signaler, observer et agir rapidement pour préserver les forêts de Mahagi.
+            </p>
+
+            <div style="min-height: 30px;"></div>
+            <hr>
+            <p>
+                Le système d'alerte de déforestation de le territoire de Mahagi est né des réflexions menées par
+                Alessandro Musetta et Deogratias Ucima Wonyarossi.
+            </p>
+
             <button class="close-btn" id="close-modal">Fermer</button>
         </div>
     </div>
@@ -665,20 +609,15 @@
                     // Map setup (global)
                     // const mapBounds = L.latLngBounds([-2.3293, 28.9075], [-1.8339, 29.207]);
                     window.map = L.map('map', {
-                        minZoom: 10,
-                        maxZoom: 16,
+                        minZoom: 8,
+                        maxZoom: 15,
                         // maxBounds: mapBounds
-                    }).setView([2.1887, 31.1820], 11);
+                    }).setView([2.1887, 31.1820], 10);
 
                     // Tile layers...
                     L.tileLayer(
-                        "https://www.alessandromusetta.com/geo/tiles/minimapidjwi/{z}/{x}/{y}.png",
-                        { minZoom: 8, maxZoom: 12, noWrap: true, attribution: "" }
-                    ).addTo(window.map);
-
-                    L.tileLayer(
-                        "https://www.alessandromusetta.com/geo/tiles/idjwi/{z}/{x}/{y}.jpg",
-                        { minZoom: 13, maxZoom: 16, noWrap: true, attribution: "" }
+                        "https://www.alessandromusetta.com/geo/tiles/mahagi/{z}/{x}/{y}.png",
+                        { minZoom: 8, maxZoom: 15, noWrap: true, attribution: "" }
                     ).addTo(window.map);
 
                     // Fetch alerts
@@ -761,7 +700,7 @@
                         const oldestDate = dates[0];
 
                         const halfSideDeg = 0.000135; // ~30 m
-                        const circleRadius = 50;
+                        const circleRadius = 100;
 
                         alerts.forEach(alert => {
                             if (!alert.geom?.coordinates) return;
@@ -810,7 +749,7 @@
                             circle.bindPopup(popupContent);
                         });
 
-                        // 🔍 Zoom logic
+                        // Zoom logic
                         if (zoomToLatest) {
                             const latestAlerts = alerts.filter(
                                 a => new Date(a.alert_date).toISOString().split('T')[0] === latestDate
@@ -884,33 +823,63 @@
                 const script = document.createElement("script");
                 script.src = "community-notes.js";
                 document.body.appendChild(script);
+
+                script.onload = () => {
+                    window.initCommunityNotes();
+                };
             };
         })();
 
         const guideBtn = document.getElementById('open-guide');
-        guideBtn.addEventListener('click', async () => {
-            try {
-                const response = await fetch('Guide_utilisation_du_systeme_alerte_deforestation_idjwi.txt');
-                const text = await response.text();
-                const modal = document.createElement('div');
-                modal.className = 'modal';
-                modal.style.display = 'flex';
-                modal.innerHTML = `
-<div class="modal-content" style="max-height:80%; overflow:auto; text-align:left; font-family:'Karla-Cedille', sans-serif;">
-    <pre style="white-space: pre-wrap; word-wrap: break-word; margin:0; padding:0; font-family:'Karla-Cedille'">${text}</pre>
-    <div style="text-align:center; margin-top:20px;">
-        <button class="close-btn">Fermer</button>
-    </div>
+
+        if (guideBtn) {
+            guideBtn.addEventListener('click', async () => {
+                try {
+
+                    const response = await fetch('./Guide_utilisation_du_systeme_alerte_deforestation_idjwi.txt');
+                    const text = await response.text();
+
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.style.display = 'flex';
+
+                    modal.innerHTML = `
+<div class="modal-content" style="max-height:80%; overflow:auto; text-align:left; font-family:'Simsun', sans-serif;">
+<pre style="white-space: pre-wrap; word-wrap: break-word; margin:0; font-family:'Simsun';">${text}</pre>
+<div style="text-align:center; margin-top:20px;">
+<button class="close-btn">Fermer</button>
+</div>
 </div>
 `;
-                document.body.appendChild(modal);
-                modal.querySelector('.close-btn').onclick = () => modal.remove();
-                modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-            } catch (err) {
-                console.error('Could not load guide:', err);
-            }
-        });
+
+                    document.body.appendChild(modal);
+
+                    modal.querySelector('.close-btn').onclick = () => modal.remove();
+
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) modal.remove();
+                    });
+
+                } catch (err) {
+                    console.error('Guide loading error:', err);
+                }
+            });
+        }
     </script>
 </body>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => {
+                    console.log('Service Worker registered:', reg);
+                })
+                .catch(err => {
+                    console.error('Registered Service Worker failed:', err);
+                });
+        });
+    }
+</script
 
 </html>
