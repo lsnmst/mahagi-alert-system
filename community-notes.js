@@ -1,5 +1,5 @@
 // community-notes.js
-window.addEventListener('load', () => {
+window.initCommunityNotes = function () {
     if (!window.map || !window.supabaseClient) {
         console.error("Map or Supabase client not found!");
         return;
@@ -191,4 +191,4 @@ ${n.validated ? '' : '<br><i style="color:#a00;">En attente de validation</i>'}
 
     fetchAndRenderNotes();
     map.on('moveend', fetchAndRenderNotes);
-});
+};
