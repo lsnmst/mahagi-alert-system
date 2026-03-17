@@ -95,9 +95,7 @@ DERNIÈRE MISE À JOUR : JJ-MM-AAAA
 
 //  Auteurs et remerciements // 
 
-Le système d'alerte à la déforestation de l'île d'Idjwi encourage la collaboration entre les chercheurs, les développeurs et les communautés locales engagées dans la conservation des forêts de l'île. 
-
-Conception et développement
+Conception et développement 
 (A) Alessandro Musetta
 Chercheur indépendant et développeur de solutions géospatiales. Responsable de la conception du système, du développement web, et de l’intégration des données spatiales. Spécialiste en cartographie participative et analyse environnementale.
 (B) Deogratias Ucima Wonyarossi
