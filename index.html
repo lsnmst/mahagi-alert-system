@@ -409,6 +409,26 @@
 <body>
     <div id="last-update"></div>
 
+    <div id="loader" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    font-family: 'Simsun';
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #213547;
+">
+        Chargement des alertes
+    </div>
+
     <div id="map"></div>
 
     <div id="latest-alert-label" style="
@@ -457,7 +477,7 @@
     z-index: 1000;
     pointer-events: none;
     box-shadow: 0 2px 6px rgba(0,0,0,0);
-">TOUTES LES ALERTES DEPUIS LE 01-01-2026</div>
+">TOUTES LES ALERTES DEPUIS LE 2026-01-01</div>
 
 
     <button id="add-note-floating"
@@ -600,86 +620,128 @@
             // -----------------------------
             window.onload = async function () {
                 try {
-                    // Supabase setup (global)
+                    // Supabase setup
                     window.supabaseClient = supabase.createClient(
                         'https://ecoiufkxhtnwzjrwsgea.supabase.co',
                         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjb2l1Zmt4aHRud3pqcndzZ2VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzOTIzOTEsImV4cCI6MjA4ODk2ODM5MX0.X56cIiyhHEVH3Iig_KH6wboBPRY1UmlQtJ0enr0gbro'
                     );
 
-                    // Map setup (global)
-                    // const mapBounds = L.latLngBounds([-2.3293, 28.9075], [-1.8339, 29.207]);
+                    // Map setup
                     window.map = L.map('map', {
                         minZoom: 8,
-                        maxZoom: 15,
-                        // maxBounds: mapBounds
-                    }).setView([2.1887, 31.1820], 10);
+                        maxZoom: 15
+                    }).setView([2.348877, 30.69990], 10);
 
-                    // Tile layers...
+                    // Tile layer
                     L.tileLayer(
                         "https://www.alessandromusetta.com/geo/tiles/mahagi/{z}/{x}/{y}.png",
                         { minZoom: 8, maxZoom: 15, noWrap: true, attribution: "" }
                     ).addTo(window.map);
 
-                    // Fetch alerts
-                    const { data, error } = await supabaseClient
-                        .from('alerts')
-                        .select('geom, alert_value, alert_date, created_at');
+                    let allAlerts = [];
 
-                    if (error) throw error;
-                    if (!data || data.length === 0) {
-                        console.warn("⚠️ No alerts found in database.");
-                        return;
-                    }
+                    const loader = document.getElementById('loader');
+                    loader.style.display = 'flex';
 
-                    let allAlerts = data.filter(a => a.alert_date);
-                    allAlerts.sort((a, b) => new Date(a.alert_date) - new Date(b.alert_date));
+                    async function fetchAlerts() {
+                        try {
+                            let allData = [];
+                            let from = 0;
+                            const step = 1000;
+                            let done = false;
 
+                            while (!done) {
+                                const { data, error } = await supabaseClient
+                                    .from('alerts')
+                                    .select('geom, alert_value, alert_date, created_at')
+                                    .gte('alert_date', '2026-01-01')
+                                    .order('alert_date', { ascending: false })
+                                    .range(from, from + step - 1);
 
-                    // 🕒 Show "Last update" date
-                    const lastCreated = data
-                        .filter(a => a.created_at)
-                        .map(a => new Date(a.created_at))
-                        .sort((a, b) => b - a)[0]; // latest date
+                                if (error) {
+                                    console.error("❌ Fetch error:", error);
+                                    return;
+                                }
 
-                    if (lastCreated) {
-                        const formatted = lastCreated
-                            .toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                            .replaceAll('/', '-');
-                        document.getElementById('last-update').textContent = `DERNIÈRE MISE À JOUR : ${formatted}`;
-                    }
+                                if (!data || data.length === 0) break;
 
-                    // Setup date pickers with Flatpickr
-                    const startInput = document.getElementById('start-date');
-                    const endInput = document.getElementById('end-date');
+                                allData = allData.concat(data);
 
-                    const oldest = new Date(allAlerts[0].alert_date);
-                    const newest = new Date(allAlerts[allAlerts.length - 1].alert_date);
-                    const toInputDate = d => d.toISOString().split('T')[0];
+                                if (data.length < step) {
+                                    done = true;
+                                } else {
+                                    from += step;
+                                }
+                            }
 
-                    const flatpickrOptions = {
-                        locale: 'fr',
-                        dateFormat: "Y-m-d",
-                        altInput: true,
-                        altFormat: "d-m-Y",
-                        theme: 'default',
-                        onChange: function (selectedDates, dateStr) {
-                            console.log("📅 Selected:", dateStr);
+                            if (allData.length === 0) {
+                                console.warn("⚠️ No alerts found");
+                                return;
+                            }
+
+                            allAlerts = allData
+                                .filter(a => a.alert_date)
+                                .sort((a, b) => new Date(b.alert_date) - new Date(a.alert_date));
+
+                            // Initialize date pickers
+                            if (!window.datePickersInitialized && allAlerts.length > 0) {
+                                const startInput = document.getElementById('start-date');
+                                const endInput = document.getElementById('end-date');
+
+                                const newest = new Date(allAlerts[0].alert_date);
+                                const oldest = new Date(allAlerts[allAlerts.length - 1].alert_date);
+
+                                const toInputDate = d => d.toISOString().split('T')[0];
+
+                                const flatpickrOptions = {
+                                    locale: 'fr',
+                                    dateFormat: "Y-m-d",
+                                    altInput: true,
+                                    altFormat: "d-m-Y"
+                                };
+
+                                window.fpStart = flatpickr(startInput, {
+                                    ...flatpickrOptions,
+                                    defaultDate: toInputDate(oldest),
+                                    minDate: toInputDate(oldest),
+                                    maxDate: toInputDate(newest)
+                                });
+
+                                window.fpEnd = flatpickr(endInput, {
+                                    ...flatpickrOptions,
+                                    defaultDate: toInputDate(newest),
+                                    minDate: toInputDate(oldest),
+                                    maxDate: toInputDate(newest)
+                                });
+
+                                window.datePickersInitialized = true;
+                            }
+
+                            renderAlerts(allAlerts, { zoomToLatest: true });
+
+                            // Last update
+                            const lastCreated = allAlerts
+                                .filter(a => a.created_at)
+                                .map(a => new Date(a.created_at))
+                                .sort((a, b) => b - a)[0];
+
+                            if (lastCreated) {
+                                const formatted = lastCreated
+                                    .toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                                    .replaceAll('/', '-');
+                                document.getElementById('last-update').textContent =
+                                    `DERNIÈRE MISE À JOUR : ${formatted}`;
+                            }
+
+                        } catch (err) {
+                            console.error('❌ Fetch alerts failed:', err);
+                        } finally {
+                            loader.style.display = 'none';
                         }
-                    };
+                    }
 
-                    const fpStart = flatpickr(startInput, {
-                        ...flatpickrOptions,
-                        defaultDate: toInputDate(oldest),
-                        minDate: toInputDate(oldest),
-                        maxDate: toInputDate(newest)
-                    });
-
-                    const fpEnd = flatpickr(endInput, {
-                        ...flatpickrOptions,
-                        defaultDate: toInputDate(newest),
-                        minDate: toInputDate(oldest),
-                        maxDate: toInputDate(newest)
-                    });
+                    await fetchAlerts();
+                    setInterval(fetchAlerts, 60000);
 
                     // -----------------------------
                     // 3️⃣ Rendering Alerts
@@ -692,32 +754,31 @@
 
                         if (!alerts || alerts.length === 0) return;
 
-                        // Sort alerts by date
-                        alerts.sort((a, b) => new Date(a.alert_date) - new Date(b.alert_date));
-
-                        const dates = alerts.map(a => new Date(a.alert_date).toISOString().split('T')[0]);
-                        const latestDate = dates[dates.length - 1];
-                        const oldestDate = dates[0];
-
                         const halfSideDeg = 0.000135; // ~30 m
-                        const circleRadius = 100;
+                        const circleRadius = 50;
+
+                        const getLocalDay = d => {
+                            const date = new Date(d);
+                            const yyyy = date.getFullYear();
+                            const mm = String(date.getMonth() + 1).padStart(2, '0');
+                            const dd = String(date.getDate()).padStart(2, '0');
+                            return `${yyyy}-${mm}-${dd}`;
+                        };
+
+                        alerts.forEach(a => a.alertDay = getLocalDay(a.alert_date));
+
+                        const latestDate = alerts
+                            .map(a => new Date(a.alert_date).getTime())
+                            .reduce((max, ts) => ts > max ? ts : max, 0);
+
+                        const latestAlerts = alerts.filter(a => new Date(a.alert_date).getTime() === latestDate);
 
                         alerts.forEach(alert => {
                             if (!alert.geom?.coordinates) return;
-
                             const [lon, lat] = alert.geom.coordinates;
-                            const alertDate = new Date(alert.alert_date);
-                            const dateStr = alertDate.toLocaleDateString('fr-FR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric'
-                            }).replace(/\//g, '-');
 
-                            // Determine color
-                            let color = 'SlateBlue';
-                            if (alertDate.toISOString().split('T')[0] === latestDate) color = 'red';
+                            const color = latestAlerts.includes(alert) ? 'red' : 'SlateBlue';
 
-                            // 30m x 30m rectangle
                             L.rectangle([[lat - halfSideDeg, lon - halfSideDeg],
                             [lat + halfSideDeg, lon + halfSideDeg]], {
                                 color,
@@ -726,55 +787,38 @@
                                 fillOpacity: 0.6
                             }).addTo(window.alertLayerGroup);
 
-                            // Circle outline
                             const circle = L.circle([lat, lon], {
                                 radius: circleRadius,
                                 color,
-                                weight: 2,
+                                weight: 1,
                                 fill: true,
                                 fillColor: color,
                                 fillOpacity: 0,
                                 opacity: 0.7
                             }).addTo(window.alertLayerGroup);
 
-                            // Popup
                             const popupContent = `
-      Date de l'alerte : <b>${dateStr}</b><br><br>
-      <span style="border: 1px solid black; padding: 5px;">
-        Coordonnées : ${lat.toFixed(6)}, ${lon.toFixed(6)}
-        <button class="copy-btn"
-          onclick="navigator.clipboard.writeText('${lat.toFixed(6)},${lon.toFixed(6)}'); window.showCopyMessage();">⎘</button>
-      </span>
-    `;
+                        Date de l'alerte : <b>${alert.alertDay}</b><br><br>
+                        <span style="border:1px solid black;padding:5px;">
+                            Coordonnées : ${lat.toFixed(6)}, ${lon.toFixed(6)}
+                            <button class="copy-btn"
+                                onclick="navigator.clipboard.writeText('${lat.toFixed(6)},${lon.toFixed(6)}'); window.showCopyMessage();">⎘</button>
+                        </span>
+                    `;
                             circle.bindPopup(popupContent);
                         });
 
-                        // Zoom logic
-                        if (zoomToLatest) {
-                            const latestAlerts = alerts.filter(
-                                a => new Date(a.alert_date).toISOString().split('T')[0] === latestDate
-                            );
-                            if (latestAlerts.length > 0) {
-                                const bounds = L.latLngBounds(
-                                    latestAlerts.map(a => [a.geom.coordinates[1], a.geom.coordinates[0]])
-                                );
-                                map.fitBounds(bounds, { padding: [60, 60] });
-                            }
+                        if (zoomToLatest && latestAlerts.length > 0) {
+                            const bounds = L.latLngBounds(latestAlerts.map(a => [a.geom.coordinates[1], a.geom.coordinates[0]]));
+                            map.fitBounds(bounds, { padding: [60, 60] });
                         }
 
-                        // 🏷️ Update "latest alert" label
-                        const latestAlerts = alerts.filter(
-                            a => new Date(a.alert_date).toISOString().split('T')[0] === latestDate
-                        );
                         if (latestAlerts.length > 0) {
-                            const latestAlertDate = new Date(latestAlerts[0].alert_date)
-                                .toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                                .replace(/\//g, '-');
+                            const latestDayStr = getLocalDay(latestAlerts[0].alert_date);
 
                             document.getElementById('latest-alert-text').textContent =
-                                `DERNIÈRE ALERTE(S): ${latestAlertDate}`;
+                                `DERNIÈRE ALERTE(S): ${latestDayStr}`;
 
-                            // Copy button for latest alerts
                             const copyBtn = document.getElementById('copy-latest');
                             copyBtn.onclick = async () => {
                                 const coordsList = latestAlerts.map(a => {
@@ -787,19 +831,19 @@
                         }
                     }
 
-
-                    renderAlerts(allAlerts);
-
                     // -----------------------------
                     // 4️⃣ Filter Logic
                     // -----------------------------
                     const applyBtn = document.getElementById('apply-filter');
+                    const startInput = document.getElementById('start-date');
+                    const endInput = document.getElementById('end-date');
+
                     applyBtn.addEventListener('click', () => {
-                        // get start/end as local midnight
-                        const start = new Date(fpStart.selectedDates[0]);
-                        start.setHours(0, 0, 0, 0);
-                        const end = new Date(fpEnd.selectedDates[0]);
-                        end.setHours(23, 59, 59, 999); // include the full last day
+                        const start = fpStart.selectedDates[0];
+                        const end = fpEnd.selectedDates[0];
+                        if (!start || !end) return;
+
+                        end.setHours(23, 59, 59, 999);
 
                         const filtered = allAlerts.filter(a => {
                             const d = new Date(a.alert_date);
@@ -816,55 +860,57 @@
                         }
                     });
 
+                    // -----------------------------
+                    // 5️⃣ Load community notes
+                    // -----------------------------
+                    const script = document.createElement("script");
+                    script.src = "community-notes.js";
+                    document.body.appendChild(script);
+
+                    script.onload = () => {
+                        window.initCommunityNotes();
+                    };
+
                 } catch (err) {
                     console.error('❌ Error initializing map:', err);
                 }
-
-                const script = document.createElement("script");
-                script.src = "community-notes.js";
-                document.body.appendChild(script);
-
-                script.onload = () => {
-                    window.initCommunityNotes();
-                };
             };
+
+            // -----------------------------
+            // 6️⃣ Guide Button
+            // -----------------------------
+            const guideBtn = document.getElementById('open-guide');
+            if (guideBtn) {
+                guideBtn.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch('./Guide_utilisation_du_systeme_alerte_deforestation_idjwi.txt');
+                        const text = await response.text();
+
+                        const modal = document.createElement('div');
+                        modal.className = 'modal';
+                        modal.style.display = 'flex';
+
+                        modal.innerHTML = `
+                    <div class="modal-content" style="max-height:80%; overflow:auto; text-align:left; font-family:'Simsun', sans-serif;">
+                        <pre style="white-space: pre-wrap; word-wrap: break-word; margin:0; font-family:'Simsun';">${text}</pre>
+                        <div style="text-align:center; margin-top:20px;">
+                            <button class="close-btn">Fermer</button>
+                        </div>
+                    </div>
+                `;
+
+                        document.body.appendChild(modal);
+
+                        modal.querySelector('.close-btn').onclick = () => modal.remove();
+                        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+                    } catch (err) {
+                        console.error('Guide loading error:', err);
+                    }
+                });
+            }
+
         })();
-
-        const guideBtn = document.getElementById('open-guide');
-
-        if (guideBtn) {
-            guideBtn.addEventListener('click', async () => {
-                try {
-
-                    const response = await fetch('./Guide_utilisation_du_systeme_alerte_deforestation_idjwi.txt');
-                    const text = await response.text();
-
-                    const modal = document.createElement('div');
-                    modal.className = 'modal';
-                    modal.style.display = 'flex';
-
-                    modal.innerHTML = `
-<div class="modal-content" style="max-height:80%; overflow:auto; text-align:left; font-family:'Simsun', sans-serif;">
-<pre style="white-space: pre-wrap; word-wrap: break-word; margin:0; font-family:'Simsun';">${text}</pre>
-<div style="text-align:center; margin-top:20px;">
-<button class="close-btn">Fermer</button>
-</div>
-</div>
-`;
-
-                    document.body.appendChild(modal);
-
-                    modal.querySelector('.close-btn').onclick = () => modal.remove();
-
-                    modal.addEventListener('click', (e) => {
-                        if (e.target === modal) modal.remove();
-                    });
-
-                } catch (err) {
-                    console.error('Guide loading error:', err);
-                }
-            });
-        }
     </script>
 </body>
 
@@ -880,6 +926,6 @@
                 });
         });
     }
-</script
+</script>
 
 </html>
