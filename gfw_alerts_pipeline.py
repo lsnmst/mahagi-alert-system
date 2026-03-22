@@ -184,7 +184,7 @@ def dist_rasters_to_centroids(status_bytes, date_bytes, aoi_geom, target_year=20
 
                     status = int(status_arr[row, col])
 
-                    if status != 2:
+                    if status not in (7, 8):
                         continue
 
                     day_value = int(date_arr[row, col])
@@ -203,11 +203,13 @@ def dist_rasters_to_centroids(status_bytes, date_bytes, aoi_geom, target_year=20
                     if alert_date.year != target_year:
                         continue
 
+                    loss_type = "confirmed <50%" if status == 7 else "confirmed ≥50%"
+
                     centroids.append({
                         "geometry": pt,
                         "alert_value": status,
                         "alert_date": alert_date,
-                        "loss_type": "confirmed"
+                        "loss_type": loss_type
                     })
 
     finally:
